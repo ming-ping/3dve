@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Test</title>
+  </head>
+  <body>
+    <a href="https://en.wikipedia.org/wiki/WebAssembly">from wikipedia</a>
+    <p><pre>
+(module
+  (import "math" "exp" (func $exp (param f64) (result f64)))
+  (func (export "doubleExp") (param $0 f64) (result f64)
+    (f64.mul
+      (call $exp
+        (get_local $0)
+      )
+      (f64.const 2)
+    )
+  )
+)
+
+    </pre></p>
+    <script type='text/javascript'>
+
+      var importObject = {
+        imports: { imported_func: arg => console.log(arg) },
+        math:{exp: x=>Math.exp(x)}
+      };
+
+      var fileName='m.wasm';
+      fetch(fileName)
+      .then(response => response.arrayBuffer())
+      .then(bits => WebAssembly.compile(bits))
+      .then(module => {return new WebAssembly.Instance(module, importObject)})
+      .then(instance => {let f=instance.exports.doubleExp;
+        console.log("got: ", f(9.0))}
+      );
+
+
+    </script>
+
+  </body>
+</html>
+
+
